@@ -8,32 +8,28 @@
               <div v-for="item in items" :key="item.id">
                 <v-toolbar elevation="3" class="mb-2 pt-3" v-if="item.type=='input'">
                   <v-row>
-                    <v-col md="3" class="mt-3">
+                    <v-col :md="item.labelWidth" class="mt-3">
                       <p>{{item.title}}</p> 
                     </v-col>
-                    <v-spacer></v-spacer>
-                    <v-col md="9">
+                    <v-col :md="item.inputWidth">
                       <v-text-field outlined dense></v-text-field>
                     </v-col>
+                    <v-spacer></v-spacer>
                   </v-row>
                 </v-toolbar>
 
                 <div v-if="item.type=='text'">
-                  <v-row>
-                    <v-col :md="item.width[0]" v-if="item.width[0] != 0">
-                    </v-col>
-                    <v-col :md="item.width[1]-item.width[0]">
-                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-left" v-if="item.align=='left'">
-                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
-                      </v-toolbar>
-                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-center" v-if="item.align=='center'">
-                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
-                      </v-toolbar>
-                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-end" v-if="item.align=='end'">
-                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
-                      </v-toolbar>
-                    </v-col>
-                  </v-row>
+                  <v-toolbar elevation="3" class="mb-2 pt-3">
+                    <v-row>
+                      <v-col :md="item.width[0]" v-if="item.width[0] != 0">
+                      </v-col>
+                      <v-col :md="item.width[1]-item.width[0]">
+                        <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:start"' v-if="item.align == 'left'"> {{item.title}} </p>
+                        <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:center"' v-if="item.align == 'center'"> {{item.title}} </p>
+                        <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:end"' v-if="item.align == 'end'"> {{item.title}} </p>
+                      </v-col>
+                    </v-row>
+                  </v-toolbar>
                 </div>
               </div>
               <v-toolbar elevation="3">
