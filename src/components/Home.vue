@@ -1,32 +1,50 @@
 <template>
   <div>
-    <div class="d-flex justify-center mt-3">
-      <v-btn class="ma-2">Thêm text</v-btn>
-      <v-btn class="ma-2">Thêm input</v-btn>
-      <v-btn class="ma-2">Thêm table</v-btn>
-      <v-btn class="ma-2">Thêm ảnh</v-btn>
-    </div>
-
     <div class="d-flex">
       <v-row>
         <v-col md="6">
           <v-container>
-            <v-form>
-              <v-card class="pa-5">
-                <v-text-field label="Id" v-model="newItem.id"></v-text-field>
-                <v-text-field label="Title" v-model="newItem.title"></v-text-field>
-                <v-text-field label="Placeholder" v-model="newItem.placeholder"></v-text-field>
-                <v-row>
-                  <v-col>
-                    <div>Chọn chiều dài</div>
-                    <v-range-slider min="0" max="12" :tick-labels="['0', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]" v-model="newItem.width"></v-range-slider>
-                  </v-col>
-                </v-row>
-                <v-row>
-                  <v-btn class="mx-3 success" @click="create()">Tạo mới</v-btn>
-                </v-row>
-              </v-card>
-            </v-form>
+            <v-card class="pa-5">
+              <div v-for="item in items" :key="item.id">
+                <v-toolbar elevation="3" class="mb-2 pt-3" v-if="item.type=='input'">
+                  <v-row>
+                    <v-col md="3" class="mt-3">
+                      <p>{{item.title}}</p> 
+                    </v-col>
+                    <v-spacer></v-spacer>
+                    <v-col md="9">
+                      <v-text-field outlined dense></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-toolbar>
+
+                <div v-if="item.type=='text'">
+                  <v-row>
+                    <v-col :md="item.width[0]" v-if="item.width[0] != 0">
+                    </v-col>
+                    <v-col :md="item.width[1]-item.width[0]">
+                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-left" v-if="item.align=='left'">
+                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
+                      </v-toolbar>
+                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-center" v-if="item.align=='center'">
+                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
+                      </v-toolbar>
+                      <v-toolbar elevation="3" class="mb-2 pt-3 d-flex justify-end" v-if="item.align=='end'">
+                        <p :style="'font-weight:' + item.weight  + ';font-style:' + item.style"> {{item.title}} </p>
+                      </v-toolbar>
+                    </v-col>
+                  </v-row>
+                </div>
+              </div>
+              <v-toolbar elevation="3">
+                <v-spacer></v-spacer>
+                <v-btn class="ma-2" color="pink lighten-5" @click="showTextDialog">Text</v-btn>
+                <v-btn class="ma-2" color="pink lighten-5" @click="showInputDialog">Input</v-btn>
+                <v-btn class="ma-2" color="pink lighten-5" @click="showTableDialog">Table</v-btn>
+                <v-btn class="ma-2" color="pink lighten-5" @click="showImageDialog">Ảnh</v-btn>
+                <v-spacer></v-spacer>
+              </v-toolbar>
+            </v-card>
           </v-container>
         </v-col>
 
@@ -52,7 +70,7 @@
                       <v-icon small>mdi-content-copy</v-icon>
                     </v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn small fab class="mr-3"  @click="showEform"> Eform </v-btn>
+                    <v-btn small fab class="mr-3" @click="showEform"> Eform </v-btn>
                     <v-btn small fab  @click="showPDF"> PDF </v-btn>
                   </v-row>
                   <div id="jrxml"></div>
@@ -63,6 +81,12 @@
         </v-col>
       </v-row>
     </div>
+
+    <v-dialog v-model="textDialog" width="800"> <text-dialog @add="add"></text-dialog>
+    </v-dialog>
+    
+    <v-dialog v-model="inputDialog" width="800"> <input-dialog @add="add"></input-dialog>
+    </v-dialog>
   </div>
 </template>
 
@@ -71,19 +95,27 @@
 import { html } from '@/files/html.js'
 import { script } from '@/files/script.js'
 import { jrxml } from '@/files/jrxml.js'
+import TextDialog from './TextDialog.vue'
+import InputDialog from './InputDialog.vue'
 
 export default {
   data: () => ({
     items: [],
     newItem: {},
-    content: 'script'
+    type: 'input',
+    content: 'script',
+    inputDialog: false,
+    textDialog: false,
+    tableDialog: false,
+    imageDialog: false
   }),
-
+  components: {TextDialog, InputDialog},
   mixins: [html, script, jrxml],
   methods: {
-    create() {
+
+    add(item) {
       let vm = this
-      vm.items.push(vm.newItem)
+      vm.items.push(item)
       let jrxml = document.getElementById('jrxml')
       let script = document.getElementById('script')
       let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
@@ -109,6 +141,24 @@ export default {
     showEform() {
       let vm = this
       vm.content = 'script'   
+    },
+
+    showInputDialog() {
+      let vm = this
+      vm.inputDialog = true
+      vm.textDialog = false
+      vm.tableDialog = false
+      vm.imageDialog = false
+      vm.type = 'input'
+    },
+
+    showTextDialog() {
+      let vm = this
+      vm.inputDialog = false
+      vm.textDialog = true
+      vm.tableDialog = false
+      vm.imageDialog = false
+      vm.type = 'text'
     }
   }
 };

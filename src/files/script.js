@@ -29,9 +29,15 @@ export const script = {
             let bindings = ''
 
             items.forEach(item => {
-                properties += createProperty(item.id)
-                fieldOptions += createFieldOption(item.id, item.title)
-                bindings += createBinding(item.id)
+                if (item.type == 'input' && item != items.at(-1)) {
+                    properties += createProperty(item.id) + ","
+                    fieldOptions += createFieldOption(item.id, item.title) + ","
+                    bindings += createBinding(item.id) + ","
+                } else if (item.type == 'input') {
+                    properties += createProperty(item.id)
+                    fieldOptions += createFieldOption(item.id, item.title)
+                    bindings += createBinding(item.id)
+                }
             });
 
             return `{

@@ -1,5 +1,14 @@
 .content {
     background: #ffdcdc; 
-    height: 80vh; 
+    height: 95vh; 
     overflow: auto
+}
+.size .v-btn__content {
+    width: 100%;
+}
+.size .v-input__slot {
+    padding: 0 !important;
+    padding-top: 7px !important;
+    padding-left: 11px !important;
+    padding-right: 11px !important;
 }

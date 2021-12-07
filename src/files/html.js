@@ -3,17 +3,25 @@ export const html = {
         createHtml(items) {
             let html = htmlstyle;
             items.forEach(item => {
-                html += createInput(item.id, item.title);
+                if (item.type == 'text') {
+                    html += createText(item.title)
+                } else if (item.type == 'input') {
+                    html += createInput(item.id, item.title);
+                }
             });
             return html + ` </div>`
         }
     }
 }
 
-// function createText(title) {
-//     return `
-//     <h3 class='text-center'><strong>` + title + `</strong></h3> `;
-// }
+function createText(title) {
+    return `
+    <div class='row'>
+        <div class='span12 row-flex'>
+            <label>` + title + `</label>
+        </div>
+    </div>`;
+}
 
 function createInput(id, label) {
     return `

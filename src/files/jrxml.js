@@ -4,7 +4,7 @@ function createField(id) {
     </field>`
 }
 
-function createBand(id, title) {
+function createInputBand(id, title) {
     return `<band height="20">
         <textField isStretchWithOverflow="true">
             <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
@@ -19,6 +19,21 @@ function createBand(id, title) {
     </band>`
 }
 
+function createTextBand(title) {
+    return `<band height="20">
+        <textField isStretchWithOverflow="true">
+            <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
+                <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+            </reportElement>
+            <textElement textAlignment="Left" verticalAlignment="Top" markup="none">
+                <font fontName="Times New Roman" size="12" isBold="false"/>
+                <paragraph lineSpacing="Double" spacingBefore="5"/>
+            </textElement>
+            <textFieldExpression><![CDATA["` + title +`"]]></textFieldExpression>
+        </textField>
+    </band>`
+}
+
 export const jrxml = {
     methods: {
         createJrxml(items) {
@@ -26,10 +41,13 @@ export const jrxml = {
             let bands = ''
 
             items.forEach(item => {
-                fields += createField(item.id)
-                bands += createBand(item.id, item.title)
+                if (item.type == 'input') {
+                    fields += createField(item.id)
+                    bands += createInputBand(item.id, item.title)
+                } else if (item.type == 'text') {
+                    bands += createTextBand(item.title)
                 }
-            );
+            });
             
             return startContent + fields + midContent + bands + endContent
         }
