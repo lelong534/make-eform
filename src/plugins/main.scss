@@ -12,3 +12,24 @@
     padding-left: 11px !important;
     padding-right: 11px !important;
 }
+.action-bars {
+    position: absolute;
+    left: 47%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+.v-toolbar:hover .action-bars {
+    display: block;
+    margin-top: -28px;
+}
+
+.v-toolbar__content p {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.v-toolbar__content .row .col {
+    padding: 3px !important;
+}

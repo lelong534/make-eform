@@ -19,17 +19,38 @@ function createInputBand(id, title) {
     </band>`
 }
 
-function createTextBand(title) {
+function createTextBand(item) {
+    let align = ''
+    if (item.align == 'left') {
+        align = `<textElement textAlignment="Left" verticalAlignment="Top" markup="none">`
+    } else if (item.align == 'center') {
+        align = `<textElement textAlignment="Center" verticalAlignment="Top" markup="none">`
+    } else if (item.align == 'end') {
+        align = `<textElement textAlignment="Right" verticalAlignment="Top" markup="none">`
+    }
+
+    let isBold = `false`
+    if (item.weight == 'bold') isBold = `true`
+
+    let isItalic = `false`
+    if (item.style == 'italic') isItalic = `true`
+
+    let size = `12`
+    if (item.size == 'h3') {
+        size = `14`
+        isBold = true
+    }
+
     return `<band height="20">
         <textField isStretchWithOverflow="true">
             <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
                 <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
             </reportElement>
-            <textElement textAlignment="Left" verticalAlignment="Top" markup="none">
-                <font fontName="Times New Roman" size="12" isBold="false"/>
+            `+ align +`
+                <font fontName="Times New Roman" size="`+ size +`" isBold="`+ isBold + `" isItalic="` + isItalic +`"/>
                 <paragraph lineSpacing="Double" spacingBefore="5"/>
             </textElement>
-            <textFieldExpression><![CDATA["` + title +`"]]></textFieldExpression>
+            <textFieldExpression><![CDATA["` + item.title +`"]]></textFieldExpression>
         </textField>
     </band>`
 }
@@ -45,7 +66,7 @@ export const jrxml = {
                     fields += createField(item.id)
                     bands += createInputBand(item.id, item.title)
                 } else if (item.type == 'text') {
-                    bands += createTextBand(item.title)
+                    bands += createTextBand(item)
                 }
             });
             

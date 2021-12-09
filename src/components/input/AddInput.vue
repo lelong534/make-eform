@@ -24,12 +24,15 @@
 <script>
 export default {
     data: () => ({
-        newItem: {}
+        newItem: {},
     }),
+    props: ['index'],
     methods: {
         add() {
             let vm = this
-            vm.newItem.type = 'input'
+            if (vm.index != undefined) {
+                vm.newItem.parentIndex = vm.index
+            }
             vm.$emit("add", this.newItem)
             vm.newItem = {}
         }

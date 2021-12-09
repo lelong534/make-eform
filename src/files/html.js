@@ -4,9 +4,11 @@ export const html = {
             let html = htmlstyle;
             items.forEach(item => {
                 if (item.type == 'text') {
-                    html += createText(item.title)
+                    html += createText(item)
                 } else if (item.type == 'input') {
-                    html += createInput(item.id, item.title);
+                    html += createInput(item.id, item.title)
+                } else if (item.type == 'table') {
+                    html += createTable(item.id)
                 }
             });
             return html + ` </div>`
@@ -14,13 +16,32 @@ export const html = {
     }
 }
 
-function createText(title) {
+function createText(item) {
+    let align = ''
+    if (item.align == 'center') {
+        align = "flex-center"
+    } else if (item.align == 'end') {
+        align = "flex-end"
+    }
+
+    let style = ''
+    if (item.weight == 'bold') style += ` font-weight-bold ` 
+    if (item.style  == 'italic') style += ` font-style-italic `
+    if (item.size  == 'h3') style += ` font-format-h3 `
+
+    // space
+    let leftSpace = item.width[0]
+    let rightSpace = 12 - item.width[1]
+    let contentSpace = item.width[1] - item.width[0]
+
     return `
     <div class='row'>
-        <div class='span12 row-flex'>
-            <label>` + title + `</label>
+        `+ (leftSpace > 0 ? `<div class='span`+ leftSpace +` row-flex'></div>` : '') 
+        + `<div class='span`+ contentSpace +` row-flex ` + align + ` ` + style + ` ` + `'>
+            <label>` + item.title + `</label>
         </div>
-    </div>`;
+        `+ (rightSpace > 0 ? `<div class='span`+ rightSpace +` row-flex'></div>` : '')
+    +`</div>`;
 }
 
 function createInput(id, label) {
@@ -31,6 +52,15 @@ function createInput(id, label) {
             <div class='form-control' id='column-`+ id + `'></div>
         </div>
     </div>`;
+}
+
+function createTable(id) {
+    return `
+    <div class='row'>`
+        + ("<div class='span12 row-flex'>") +
+            `<div class='form-control' id='column-`+ id +`'></div>
+        </div>
+    </div>`
 }
 
 const htmlstyle = `<div class='alpacaa' style='font-family: ‘Times New Roman’, Times, serif; font-size: 14px; width: 100%; margin: 0 auto;'>
@@ -177,6 +207,11 @@ const htmlstyle = `<div class='alpacaa' style='font-family: ‘Times New Roman�
             justify-content: center;
         }
 
+        .alpacaa .flex-end {
+            -webkit-justify-content: end;
+            justify-content: end;
+        }
+
         .alpacaa .flex-wrap {
             -webkit-flex-wrap: wrap;
             flex-wrap: wrap;
@@ -311,6 +346,21 @@ const htmlstyle = `<div class='alpacaa' style='font-family: ‘Times New Roman�
 
         .alpacaa table th {
             text-align: center;
+        }
+
+        .alpacaa .font-weight-bold label {
+            font-weight: bold;
+        }
+
+        .alpacaa .font-style-italic label {
+            font-style: italic;
+        }
+
+        .alpacaa .font-format-h3 label {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 15px;
         }
 
         #nguoiky {

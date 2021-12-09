@@ -5,19 +5,31 @@
         <v-col md="6">
           <v-container>
             <v-card class="pa-5">
-              <div v-for="item in items" :key="item.id">
+              <div v-for="item in items" :key="item.index">
+                <!-- show input -->
                 <v-toolbar elevation="3" class="mb-2 pt-3" v-if="item.type=='input'">
-                  <v-row>
-                    <v-col :md="item.labelWidth" class="mt-3">
-                      <p>{{item.title}}</p> 
-                    </v-col>
-                    <v-col :md="item.inputWidth">
-                      <v-text-field outlined dense></v-text-field>
-                    </v-col>
-                    <v-spacer></v-spacer>
-                  </v-row>
+                  <!-- <div> -->
+                    <v-row>
+                      <div v-for="input in item.inputs" :key="input.id" class="d-flex">
+                        <v-col :md="input.labelWidth" class="mt-3">
+                          <p>{{input.title}}</p> 
+                        </v-col>
+                        <v-col :md="input.inputWidth">
+                          <v-text-field outlined dense></v-text-field>
+                        </v-col>
+                      </div>
+                      <v-spacer></v-spacer>
+                    </v-row>
+                  <!-- </div> -->
+                  <div class="action-bars">
+                    <v-btn fab class="ma-2" small @click="dupl(item)"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn fab class="ma-2" small @click="edit(item)"><v-icon small>mdi-pencil</v-icon></v-btn>
+                    <v-btn fab class="ma-2" small @click="del(item)"><v-icon small>mdi-minus</v-icon></v-btn>
+                    <v-btn class="ma-2" small @click="addTextToInput(item)">+ Text</v-btn>
+                    <v-btn class="ma-2" small @click="addInputToInput(item)">+ Input</v-btn>
+                  </div>
                 </v-toolbar>
-
+                <!-- show text -->
                 <div v-if="item.type=='text'">
                   <v-toolbar elevation="3" class="mb-2 pt-3">
                     <v-row>
@@ -31,19 +43,30 @@
                     </v-row>
                   </v-toolbar>
                 </div>
+                <!-- show table -->
+                <div v-if="item.type == 'table'">
+                  <v-toolbar elevation="3" class="mb-2 pt-3">
+                    <v-row class="d-flex justify-space-between mb-3">
+                      <v-col v-for="item in item.column" :key="item.index">
+                        <v-card outlined tile class="text-center"> {{item.name}} </v-card>
+                      </v-col>
+                    </v-row>
+                  </v-toolbar>
+                </div>
+                <!-- end show -->
               </div>
               <v-toolbar elevation="3">
                 <v-spacer></v-spacer>
                 <v-btn class="ma-2" color="pink lighten-5" @click="showTextDialog">Text</v-btn>
                 <v-btn class="ma-2" color="pink lighten-5" @click="showInputDialog">Input</v-btn>
                 <v-btn class="ma-2" color="pink lighten-5" @click="showTableDialog">Table</v-btn>
-                <v-btn class="ma-2" color="pink lighten-5" @click="showImageDialog">Ảnh</v-btn>
                 <v-spacer></v-spacer>
               </v-toolbar>
             </v-card>
           </v-container>
         </v-col>
 
+        <!-- show script, pdf -->
         <v-col md="6">
           <v-container>
             <v-row>
@@ -75,13 +98,20 @@
             </v-row>
           </v-container>
         </v-col>
+        <!-- end show script, pdf -->
       </v-row>
     </div>
 
-    <v-dialog v-model="textDialog" width="800"> <text-dialog @add="add"></text-dialog>
+    <v-dialog v-model="textDialog" width="800"> <text-dialog @add="add" :item="selectedItem" :index="itemIndexToAdd"></text-dialog>
     </v-dialog>
     
-    <v-dialog v-model="inputDialog" width="800"> <input-dialog @add="add"></input-dialog>
+    <v-dialog v-model="addInputDialog" width="800"> <add-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></add-input>
+    </v-dialog>
+
+    <v-dialog v-model="editInputDialog" width="800"> <edit-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></edit-input>
+    </v-dialog>
+
+    <v-dialog v-model="tableDialog" width="800"> <table-dialog @add="add" :item="selectedItem" :index="itemIndexToAdd"></table-dialog>
     </v-dialog>
   </div>
 </template>
@@ -92,31 +122,127 @@ import { html } from '@/files/html.js'
 import { script } from '@/files/script.js'
 import { jrxml } from '@/files/jrxml.js'
 import TextDialog from './TextDialog.vue'
-import InputDialog from './InputDialog.vue'
+import TableDialog from './TableDialog.vue'
+import AddInput from './input/AddInput.vue'
+import EditInput from './input/EditInput.vue'
 
 export default {
   data: () => ({
     items: [],
     newItem: {},
+    selectedItem: {
+      labelWidth: 1,
+      inputWidth: 11
+    },
+    itemIndexToAdd: null,
     type: 'input',
     content: 'script',
-    inputDialog: false,
+    addInputDialog: false,
+    editInputDialog: false,
     textDialog: false,
     tableDialog: false,
-    imageDialog: false
+    itemsAddToInput: ["Text", "Input"],
+    newItemIndex: 0,
+    newInputIndex: 0
   }),
-  components: {TextDialog, InputDialog},
+  components: {TextDialog, TableDialog, AddInput, EditInput},
   mixins: [html, script, jrxml],
   methods: {
-
     add(item) {
       let vm = this
-      vm.items.push(item)
+      console.log(item)
+      if (item.index == undefined) {
+        item.index = vm.newItemIndex
+        vm.items.push(item)
+        vm.newItemIndex++
+      } else {
+        let findIndex = vm.items.findIndex(i => i.index == item.index)
+        vm.items[findIndex] = item
+      }
+      
+      vm.selectedItem = {
+        labelWidth: 1,
+        inputWidth: 11
+      }
+      console.log(vm.items)
       let jrxml = document.getElementById('jrxml')
       let script = document.getElementById('script')
       let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
       jrxml.innerText = vm.createJrxml(vm.items) 
       script.innerText = vm.createScript(vm.items, html)
+    },
+
+    addInput(itemInput) {
+      let vm = this
+      if (itemInput.parentIndex == undefined) {
+        itemInput.index = vm.newInputIndex
+        itemInput.parentIndex = vm.newItemIndex
+        vm.newItemIndex++
+        vm.newInputIndex++
+        
+        let item = {
+          index: vm.newItemIndex,
+          inputs: [itemInput],
+          type: 'input'
+        }
+        
+        vm.items.push(item)
+        vm.newItemIndex++
+      } else {
+        let findIndex = vm.items.findIndex(i => i.index == itemInput.parentIndex)
+        vm.items[findIndex].inputs.push(itemInput)
+      }
+      
+      vm.selectedItem = {
+        labelWidth: 1,
+        inputWidth: 11
+      }
+      vm.itemIndexToAdd = ''
+      console.log(vm.items + "=======")
+      let jrxml = document.getElementById('jrxml')
+      let script = document.getElementById('script')
+      let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
+      jrxml.innerText = vm.createJrxml(vm.items) 
+      script.innerText = vm.createScript(vm.items, html)
+    },
+
+    edit(item) {
+      this.selectedItem = item
+      this.editInputDialog = true
+    },
+
+    del(item) {
+      let vm = this
+      vm.items = vm.items.filter(i => i.index != item.index)
+    },
+
+    dupl(item) {
+      let vm = this
+      let duplItem = {
+        index: vm.newItemIndex + 1,
+        id: item.id,
+        title: item.title,
+        placeholder: item.placeholder,
+        labelWidth: item.labelWidth,
+        inputWidth: item.inputWidth,
+        type: 'input'
+      }
+      let findIndex = vm.items.findIndex(i => i.index == item.index)
+      vm.items.splice(vm.items[findIndex], 0, duplItem)
+      vm.items.join()
+      vm.newItemIndex++
+    },
+
+    addTextToInput(item) {
+      let vm = this
+      vm.itemIndexToAdd = item.index
+      vm.textDialog = true
+    },
+
+    addInputToInput(item) {
+      let vm = this
+      vm.itemIndexToAdd = item.index
+      vm.addInputDialog = true
     },
 
     copyScript() {
@@ -141,11 +267,11 @@ export default {
 
     showInputDialog() {
       let vm = this
-      vm.inputDialog = true
+      vm.addInputDialog = true
       vm.textDialog = false
       vm.tableDialog = false
-      vm.imageDialog = false
       vm.type = 'input'
+      console.log(vm.selectedItem)
     },
 
     showTextDialog() {
@@ -153,8 +279,15 @@ export default {
       vm.inputDialog = false
       vm.textDialog = true
       vm.tableDialog = false
-      vm.imageDialog = false
       vm.type = 'text'
+    },
+
+    showTableDialog() {
+      let vm = this
+      vm.addInputDialog = false
+      vm.textDialog = false
+      vm.tableDialog = true
+      vm.type = 'table'
     }
   }
 };
