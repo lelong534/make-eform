@@ -11,20 +11,128 @@ function createField(item) {
     return fields
 }
 
+function createTableField(item) {
+    let autoIncrement = true
+    let startField = ''
+    let endField = ''
+    let bodyField = ''
+
+    if (autoIncrement) {
+        startField = `
+            <subDataset name="data`+ item.id +`">
+                <property name="com.jaspersoft.studio.data.defaultdataadapter"/>
+                <queryString language="json">
+                    <![CDATA[`+ item.id +`]]>
+                </queryString>
+                <field name="stt" class="java.lang.String">
+                    <fieldDescription><![CDATA[stt]]></fieldDescription>
+                </field>`
+
+        endField = `
+                <group name="stt">
+                    <groupExpression><![CDATA[$F{stt}]]></groupExpression>
+                </group>
+            </subDataset>`
+    }
+
+    item.column.forEach(col => {
+        bodyField += `
+            <field name="`+col.id+`" class="java.lang.String">
+                <fieldDescription><![CDATA[`+col.id+`]]></fieldDescription>
+            </field>`
+    })
+
+    return startField + bodyField + endField
+}
+
+function createTableBand(item) {
+    let autoIncrement = true
+    let startBands = ''
+    let endBands = ''
+    let bodyBands = ''
+    let tableColumnNumber = item.column.length
+
+    if (autoIncrement) {
+        startBands = `
+            <band height="60">
+                <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+                <componentElement>
+                    <reportElement x="60" y="0" width="470" height="60">
+                        <property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+                        <property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+                        <property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+                    </reportElement>
+                    <jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+                        <datasetRun subDataset="data`+item.id+`">
+                            <dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("`+item.id+`")]]></dataSourceExpression>
+                        </datasetRun>
+                        <jr:column width="40">
+                            <jr:columnHeader style="Table_CH" height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="40" height="30"/>
+                                <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="Times New Roman" size="12" isBold="true"/>
+                                </textElement>
+                                <text><![CDATA[TT]]></text>
+                            </staticText>
+                            </jr:columnHeader>
+                            <jr:detailCell style="Table_TD" height="30">
+                            <textField>
+                                <reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="30"/>
+                                <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="Times New Roman" size="12"/>
+                                </textElement>
+                                <textFieldExpression><![CDATA[$V{stt_COUNT}]]></textFieldExpression>
+                            </textField>
+                            </jr:detailCell>
+                        </jr:column>`
+
+        endBands = ` </jr:table>
+                </componentElement>
+            </band>`
+        
+        item.column.forEach(col => {
+            bodyBands += `
+                <jr:column width="`+430/tableColumnNumber+`">
+                    <jr:columnHeader style="Table_CH" height="30">
+                        <staticText>
+                            <reportElement x="0" y="0" width="`+430/tableColumnNumber+`" height="30"/>
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="Times New Roman" size="12" isBold="true"/>
+                            </textElement>
+                            <text><![CDATA[`+col.name+`]]></text>
+                        </staticText>
+                    </jr:columnHeader>
+                    <jr:detailCell style="Table_TD" height="30">
+                        <textField>
+                            <reportElement x="0" y="0" width="`+430/tableColumnNumber+`" height="30"/>
+                            <textElement textAlignment="Center" verticalAlignment="Middle">
+                                <font fontName="Times New Roman" size="12"/>
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{`+col.id+`} == null ? "" : TRIM($F{`+col.id+`})]]></textFieldExpression>
+                        </textField>
+                    </jr:detailCell>
+                </jr:column>`
+        })
+    
+        return startBands + bodyBands + endBands
+    }
+}
+
 function createInputBand(item) {
     let inputBandData = ''
     item.inputs.forEach(input => {
         if (input.type == 'input') {
             if (input != item.inputs.at(-1)) {
-                inputBandData += `"`+ input.title + `" + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) + `
+                inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`})) + `
             } else {
-                inputBandData += `"`+ input.title + `" + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
+                inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
             }
         } else if (input.type == 'text') {
-            if (input != item.input.at(-1)) {
-                inputBandData += `"`+ input.title + `" + `
+            if (input != item.inputs.at(-1)) {
+                inputBandData += `" `+ input.title + ` " + `
             } else {
-                inputBandData += `"`+ input.title + `" + `
+                inputBandData += `" `+ input.title + ` " `
             }
         }
     })
@@ -84,6 +192,7 @@ export const jrxml = {
         createJrxml(items) {
             let fields = ''
             let bands = ''
+            let hasTable = false
 
             items.forEach(item => {
                 if (item.type == 'input') {
@@ -91,8 +200,16 @@ export const jrxml = {
                     bands += createInputBand(item)
                 } else if (item.type == 'text') {
                     bands += createTextBand(item)
+                } else if (item.type == 'table') {
+                    hasTable = true
+                    fields += createTableField(item)    
+                    bands += createTableBand(item)
                 }
             });
+
+            if (hasTable) {
+                return startContent + tableStyle + fields + midContent + bands + endContent
+            }
             
             return startContent + fields + midContent + bands + endContent
         }
@@ -112,3 +229,23 @@ const midContent =  `
 const endContent = `
 	</detail>
     </jasperReport>`
+
+const tableStyle = `
+    <style name="Table_CH" mode="Opaque" backcolor="#FFFFFF">
+        <box>
+            <pen lineWidth="0.5" lineColor="#000000"/>
+            <topPen lineWidth="0.5" lineColor="#000000"/>
+            <leftPen lineWidth="0.5" lineColor="#000000"/>
+            <bottomPen lineWidth="0.5" lineColor="#000000"/>
+            <rightPen lineWidth="0.5" lineColor="#000000"/>
+        </box>
+    </style>
+    <style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+        <box>
+            <pen lineWidth="0.5" lineColor="#000000"/>
+            <topPen lineWidth="0.5" lineColor="#000000"/>
+            <leftPen lineWidth="0.5" lineColor="#000000"/>
+            <bottomPen lineWidth="0.5" lineColor="#000000"/>
+            <rightPen lineWidth="0.5" lineColor="#000000"/>
+        </box>
+    </style>`
