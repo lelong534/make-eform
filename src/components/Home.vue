@@ -7,25 +7,25 @@
             <v-card class="pa-5">
               <div v-for="item in items" :key="item.index">
                 <!-- show input -->
-                <v-toolbar elevation="3" class="mb-2 pt-3" v-if="item.type=='input'">
-                  <!-- <div> -->
-                    <v-row>
-                      <div v-for="input in item.inputs" :key="input.id" class="d-flex">
-                        <v-col :md="input.labelWidth" class="mt-3">
-                          <p>{{input.title}}</p> 
-                        </v-col>
-                        <v-col :md="input.inputWidth">
-                          <v-text-field outlined dense></v-text-field>
-                        </v-col>
+                <v-toolbar elevation="3" class="mb-2 pt-3 input-bar" v-if="item.type=='input'">
+                  <v-row>
+                    <div v-for="input in item.inputs" :key="input.id" class="d-flex px-1" :style="{'width': (input.labelWidth + input.inputWidth) * 8.33 + '%'}">
+                      <div :style="{'width': input.labelWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'input'">
+                        <p>{{input.title}}</p>
                       </div>
-                      <v-spacer></v-spacer>
-                    </v-row>
-                  <!-- </div> -->
+                      <div :style="{'width': input.inputWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'input'">
+                        <v-text-field outlined dense></v-text-field>
+                      </div>
+                      <div :style="{'width': input.labelWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'text'">
+                        <p>{{input.title}}</p>
+                      </div>
+                    </div>
+                    <v-spacer></v-spacer>
+                  </v-row>
                   <div class="action-bars">
                     <v-btn fab class="ma-2" small @click="dupl(item)"><v-icon small>mdi-content-copy</v-icon></v-btn>
                     <v-btn fab class="ma-2" small @click="edit(item)"><v-icon small>mdi-pencil</v-icon></v-btn>
                     <v-btn fab class="ma-2" small @click="del(item)"><v-icon small>mdi-minus</v-icon></v-btn>
-                    <v-btn class="ma-2" small @click="addTextToInput(item)">+ Text</v-btn>
                     <v-btn class="ma-2" small @click="addInputToInput(item)">+ Input</v-btn>
                   </div>
                 </v-toolbar>
@@ -73,28 +73,29 @@
               <v-col>
                 <v-container class="pa-3 content" :style='content == "script" ? "display: block" : "display: none"'>
                   <v-row class="pa-3">
-                    <v-btn small fab @click="copyScript">
-                      <v-icon small>mdi-content-copy</v-icon>
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn small fab class="mr-3" @click="showEform"> Eform </v-btn>
-                    <v-btn small fab @click="showPDF"> PDF </v-btn>
+                    <v-btn small fab @click="copyScript" style="position: fixed; right: 9rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn small fab @click="showEform" style="position: fixed; right: 6rem"> Eform </v-btn>
+                    <v-btn small fab @click="showPDF" style="position: fixed; right: 3rem"> PDF </v-btn>
                   </v-row>
                   <div id="script"></div>
                 </v-container>
 
                 <v-container class="pa-3 content"  :style='content == "jrxml" ? "display: block" : "display: none"'>
                   <v-row class="pa-3">
-                    <v-btn small fab @click="copyJrxml">
-                      <v-icon small>mdi-content-copy</v-icon>
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn small fab class="mr-3" @click="showEform"> Eform </v-btn>
-                    <v-btn small fab  @click="showPDF"> PDF </v-btn>
+                    <v-btn small fab @click="copyJrxml" style="position: fixed; right: 9rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn small fab @click="showEform" style="position: fixed; right: 6rem"> Eform </v-btn>
+                    <v-btn small fab  @click="showPDF" style="position: fixed; right: 3rem"> PDF </v-btn>
                   </v-row>
                   <div id="jrxml"></div>
                 </v-container>
               </v-col>
+            </v-row>
+            <v-row>
+              <v-container class="px-3 py-0">
+                <v-btn color="info" @click="importState" class="mb-3">Đặt lại cấu hình</v-btn>
+                <v-textarea rows="13" id="state-textarea" outlined :value="JSON.stringify(items, null, '\t')">
+                </v-textarea>
+              </v-container>
             </v-row>
           </v-container>
         </v-col>
@@ -106,6 +107,9 @@
     </v-dialog>
     
     <v-dialog v-model="addInputDialog" width="800"> <add-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></add-input>
+    </v-dialog>
+
+    <v-dialog v-model="addInputDialogNewRow" width="800"> <input-dialog @add="addInput"></input-dialog>
     </v-dialog>
 
     <v-dialog v-model="editInputDialog" width="800"> <edit-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></edit-input>
@@ -125,6 +129,7 @@ import TextDialog from './TextDialog.vue'
 import TableDialog from './TableDialog.vue'
 import AddInput from './input/AddInput.vue'
 import EditInput from './input/EditInput.vue'
+import InputDialog from './InputDialog.vue'
 
 export default {
   data: () => ({
@@ -141,11 +146,11 @@ export default {
     editInputDialog: false,
     textDialog: false,
     tableDialog: false,
-    itemsAddToInput: ["Text", "Input"],
+    addInputDialogNewRow: false,
     newItemIndex: 0,
     newInputIndex: 0
   }),
-  components: {TextDialog, TableDialog, AddInput, EditInput},
+  components: {TextDialog, TableDialog, AddInput, InputDialog, EditInput},
   mixins: [html, script, jrxml],
   methods: {
     add(item) {
@@ -159,17 +164,7 @@ export default {
         let findIndex = vm.items.findIndex(i => i.index == item.index)
         vm.items[findIndex] = item
       }
-      
-      vm.selectedItem = {
-        labelWidth: 1,
-        inputWidth: 11
-      }
-      console.log(vm.items)
-      let jrxml = document.getElementById('jrxml')
-      let script = document.getElementById('script')
-      let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
-      jrxml.innerText = vm.createJrxml(vm.items) 
-      script.innerText = vm.createScript(vm.items, html)
+      vm.generateScriptPdf()
     },
 
     addInput(itemInput) {
@@ -177,7 +172,6 @@ export default {
       if (itemInput.parentIndex == undefined) {
         itemInput.index = vm.newInputIndex
         itemInput.parentIndex = vm.newItemIndex
-        vm.newItemIndex++
         vm.newInputIndex++
         
         let item = {
@@ -192,13 +186,17 @@ export default {
         let findIndex = vm.items.findIndex(i => i.index == itemInput.parentIndex)
         vm.items[findIndex].inputs.push(itemInput)
       }
+      vm.itemIndexToAdd = ''
       
+      vm.generateScriptPdf()
+    },
+
+    generateScriptPdf() {
+      let vm = this
       vm.selectedItem = {
         labelWidth: 1,
         inputWidth: 11
       }
-      vm.itemIndexToAdd = ''
-      console.log(vm.items + "=======")
       let jrxml = document.getElementById('jrxml')
       let script = document.getElementById('script')
       let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
@@ -245,6 +243,13 @@ export default {
       vm.addInputDialog = true
     },
 
+    importState() {
+      let vm = this
+      let state = document.getElementById("state-textarea").value
+      vm.items = JSON.parse(state);
+      vm.generateScriptPdf()
+    },
+
     copyScript() {
       let copyText = document.getElementById('script');
       navigator.clipboard.writeText(copyText.innerText)
@@ -267,7 +272,7 @@ export default {
 
     showInputDialog() {
       let vm = this
-      vm.addInputDialog = true
+      vm.addInputDialogNewRow = true
       vm.textDialog = false
       vm.tableDialog = false
       vm.type = 'input'

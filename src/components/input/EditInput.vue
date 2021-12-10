@@ -4,6 +4,7 @@
         </v-card-title>
         <v-card-text>
             <div v-for="input in item.inputs" :key="input.id">
+                <div class="headline"><b><u><i>Input {{input.title}} </i></u></b></div>
                 <v-text-field label="id" v-model="input.id"></v-text-field>
                 <v-text-field label="Title" v-model="input.title"></v-text-field>
                 <v-text-field label="Placeholder" v-model="input.placeholder"></v-text-field>

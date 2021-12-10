@@ -1,9 +1,22 @@
 function createProperty(item) {
     if (item.type == 'input') {
-        return `"` + item.id + `": {
-            "type": "object",
-            "required": false
-        }`
+        let properties = ''
+        item.inputs.forEach(input => {
+            if (input.type == 'input') {
+                if (input != item.inputs.at(-1)) {
+                    properties += `"` + input.id + `": {
+                        "type": "object",
+                        "required": false
+                    },`
+                } else {
+                    properties += `"` + input.id + `": {
+                        "type": "object",
+                        "required": false
+                    }`
+                }
+            }
+        })
+        return properties
     } else if (item.type == 'table') {
         let properties = ''
         item.column.forEach(column => {
@@ -36,15 +49,33 @@ function createProperty(item) {
 
 function createFieldOption(item) {
     if (item.type == 'input') {
-        return `"` + item.id + `": {
-            "id": "` + item.id + `",
-            "name": "` + item.id + `",
-            "type": "text",
-            "label": "",
-            "fieldClass": "form-input-100",
-            "rule": "maxlength1000",
-            "title": "` + item.title + `"
-        }`;
+        let fields = ''
+        item.inputs.forEach(input => {
+            if (input.type == 'input') {
+                if (input != item.inputs.at(-1)) {
+                    fields += `"` + input.id + `": {
+                        "id": "` + input.id + `",
+                        "name": "` + input.id + `",
+                        "type": "text",
+                        "label": "",
+                        "fieldClass": "form-input-100",
+                        "rule": "maxlength1000",
+                        "title": "` + input.title + `"
+                    },`
+                } else {
+                    fields += `"` + input.id + `": {
+                        "id": "` + input.id + `",
+                        "name": "` + input.id + `",
+                        "type": "text",
+                        "label": "",
+                        "fieldClass": "form-input-100",
+                        "rule": "maxlength1000",
+                        "title": "` + input.title + `"
+                    }`
+                }
+            }
+        })
+        return fields
     } else if (item.type == 'table') {
         let fields = ''
         item.column.forEach(column => {
@@ -77,8 +108,21 @@ function createFieldOption(item) {
     }
 }
 
-function createBinding(id) {
-    return `"` + id +`" : "column-`+ id +`"`
+function createBinding(item) {
+    if (item.type == 'input') {
+        let bindings = ''
+        item.inputs.forEach(input => {
+            if (input.type == 'input') {
+                if (input != item.inputs.at(-1)) {
+                    bindings += `"` + input.id +`" : "column-`+ input.id +`",`
+                } else {
+                    bindings += `"` + input.id +`" : "column-`+ input.id +`"`
+                }
+            }
+        })
+        return bindings
+    }
+    return `"` + item.id +`" : "column-`+ item.id +`"`
 }
 
 export const script = {
@@ -92,11 +136,11 @@ export const script = {
                 if (item.type != 'text' && item != items.at(-1)) {
                     properties += createProperty(item) + ","
                     fieldOptions += createFieldOption(item) + ","
-                    bindings += createBinding(item.id) + ","
+                    bindings += createBinding(item) + ","
                 } else if (item.type != 'text') {
                     properties += createProperty(item)
                     fieldOptions += createFieldOption(item)
-                    bindings += createBinding(item.id)
+                    bindings += createBinding(item)
                 }
             });
 

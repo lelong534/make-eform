@@ -16,7 +16,7 @@
             </div>
         </v-card-text>
         <v-card-actions>
-            <v-btn class="mx-3 success" @click="add()">Tạo mới</v-btn>
+            <v-btn class="mx-3 success" @click="add()">Thêm</v-btn>
         </v-card-actions>
     </v-card>
 </template>
@@ -33,7 +33,15 @@ export default {
             if (vm.index != undefined) {
                 vm.newItem.parentIndex = vm.index
             }
-            vm.$emit("add", this.newItem)
+            
+            if (vm.newItem.inputWidth == '0') {
+                vm.newItem.type = 'text'
+            } else {
+                vm.newItem.type = 'input'
+            }
+
+            vm.$emit("add", vm.newItem)
+            console.log(vm.newItem)
             vm.newItem = {}
         }
     },

@@ -1,10 +1,34 @@
-function createField(id) {
-    return `<field name="` + id  + `" class="java.lang.String">
-        <fieldDescription><![CDATA[` + id + `]]></fieldDescription>
-    </field>`
+function createField(item) {
+    let fields = ''
+    item.inputs.forEach(input => {
+        if (input.type == 'input') {
+            fields += `<field name="` + input.id  + `" class="java.lang.String">
+                    <fieldDescription><![CDATA[` + input.id + `]]></fieldDescription>
+                </field>`
+        }
+        return fields
+    })
+    return fields
 }
 
-function createInputBand(id, title) {
+function createInputBand(item) {
+    let inputBandData = ''
+    item.inputs.forEach(input => {
+        if (input.type == 'input') {
+            if (input != item.inputs.at(-1)) {
+                inputBandData += `"`+ input.title + `" + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) + `
+            } else {
+                inputBandData += `"`+ input.title + `" + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
+            }
+        } else if (input.type == 'text') {
+            if (input != item.input.at(-1)) {
+                inputBandData += `"`+ input.title + `" + `
+            } else {
+                inputBandData += `"`+ input.title + `" + `
+            }
+        }
+    })
+
     return `<band height="20">
         <textField isStretchWithOverflow="true">
             <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
@@ -14,7 +38,7 @@ function createInputBand(id, title) {
                 <font fontName="Times New Roman" size="12" isBold="false"/>
                 <paragraph lineSpacing="Double" spacingBefore="5"/>
             </textElement>
-            <textFieldExpression><![CDATA["`+ title + `: " + ($F{` + id + `} == null ? "" : TRIM($F{`+ id +`}))]]></textFieldExpression>
+            <textFieldExpression><![CDATA[`+ inputBandData +`]]></textFieldExpression>
         </textField>
     </band>`
 }
@@ -63,8 +87,8 @@ export const jrxml = {
 
             items.forEach(item => {
                 if (item.type == 'input') {
-                    fields += createField(item.id)
-                    bands += createInputBand(item.id, item.title)
+                    fields += createField(item)
+                    bands += createInputBand(item)
                 } else if (item.type == 'text') {
                     bands += createTextBand(item)
                 }

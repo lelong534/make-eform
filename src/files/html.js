@@ -6,7 +6,7 @@ export const html = {
                 if (item.type == 'text') {
                     html += createText(item)
                 } else if (item.type == 'input') {
-                    html += createInput(item.id, item.title)
+                    html += createInput(item)
                 } else if (item.type == 'table') {
                     html += createTable(item.id)
                 }
@@ -44,12 +44,19 @@ function createText(item) {
     +`</div>`;
 }
 
-function createInput(id, label) {
+function createInput(item) {
+    let html = ''
+    item.inputs.forEach(input => {
+        if (input.type == 'input') {
+            html += `<label>` + input.title + `</label>
+                <div class='form-control' id='column-`+ input.id + `'></div>`
+        } else {
+            html += `<label>`+ input.title +`</label>`
+        }
+    })
     return `
     <div class='row'>
-        <div class='span12 row-flex'> 
-            <label class='span1'>` + label + `</label>
-            <div class='form-control' id='column-`+ id + `'></div>
+        <div class='span12 row-flex'>`+ html +`
         </div>
     </div>`;
 }

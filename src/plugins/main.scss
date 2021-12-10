@@ -1,6 +1,6 @@
 .content {
     background: #ffdcdc; 
-    height: 95vh; 
+    height: 47vh; 
     overflow: auto
 }
 .size .v-btn__content {
@@ -18,7 +18,9 @@
     transform: translateX(-50%);
     display: none;
 }
-
+.v-toolbar.input-bar:hover.v-toolbar {
+    background-color: #d1cccc;
+}
 .v-toolbar:hover .action-bars {
     display: block;
     margin-top: -28px;
@@ -28,8 +30,21 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    margin-top: 8px;
 }
+
+.v-toolbar__content > .row > div.d-flex {
+    padding-top: 5px;
+} 
 
 .v-toolbar__content .row .col {
     padding: 3px !important;
+}
+
+.input-bar{ 
+    height: 100% !important;
+}
+
+.input-bar .v-toolbar__content {
+    height: 100% !important;
 }
