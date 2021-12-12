@@ -41,7 +41,6 @@ export default {
             }
 
             vm.$emit("add", vm.newItem)
-            console.log(vm.newItem)
             vm.newItem = {}
         }
     },

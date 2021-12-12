@@ -1,9 +1,9 @@
 <template>
     <v-card>
-        <v-card-title class="grey lighten-2"> Thêm input
+        <v-card-title class="grey lighten-2"> Chỉnh sửa input
         </v-card-title>
         <v-card-text>
-            <div v-for="input in item.inputs" :key="input.id">
+            <div v-for="input in item.inputs" :key="input.index">
                 <div class="headline"><b><u><i>Input {{input.title}} </i></u></b></div>
                 <v-text-field label="id" v-model="input.id"></v-text-field>
                 <v-text-field label="Title" v-model="input.title"></v-text-field>

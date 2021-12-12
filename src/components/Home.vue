@@ -7,7 +7,7 @@
             <v-card class="pa-5">
               <div v-for="item in items" :key="item.index">
                 <!-- show input -->
-                <v-toolbar elevation="3" class="mb-2 pt-3 input-bar" v-if="item.type=='input'">
+                <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions" v-if="item.type=='input'">
                   <v-row>
                     <div v-for="input in item.inputs" :key="input.id" class="d-flex px-1" :style="{'width': (input.labelWidth + input.inputWidth) * 8.33 + '%'}">
                       <div :style="{'width': input.labelWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'input'">
@@ -31,7 +31,7 @@
                 </v-toolbar>
                 <!-- show text -->
                 <div v-if="item.type=='text'">
-                  <v-toolbar elevation="3" class="mb-2 pt-3">
+                  <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions">
                     <v-row>
                       <v-col :md="item.width[0]" v-if="item.width[0] != 0">
                       </v-col>
@@ -41,16 +41,26 @@
                         <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:end"' v-if="item.align == 'end'"> {{item.title}} </p>
                       </v-col>
                     </v-row>
+                    <div class="action-bars">
+                      <v-btn fab class="ma-2" small @click="dupl(item)"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                      <v-btn fab class="ma-2" small @click="edit(item)"><v-icon small>mdi-pencil</v-icon></v-btn>
+                      <v-btn fab class="ma-2" small @click="del(item)"><v-icon small>mdi-minus</v-icon></v-btn>
+                    </div>
                   </v-toolbar>
                 </div>
                 <!-- show table -->
                 <div v-if="item.type == 'table'">
-                  <v-toolbar elevation="3" class="mb-2 pt-3">
+                  <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions">
                     <v-row class="d-flex justify-space-between mb-3">
                       <v-col v-for="item in item.column" :key="item.index">
                         <v-card outlined tile class="text-center"> {{item.name}} </v-card>
                       </v-col>
                     </v-row>
+                    <div class="action-bars">
+                      <v-btn fab class="ma-2" small @click="dupl(item)"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                      <v-btn fab class="ma-2" small @click="edit(item)"><v-icon small>mdi-pencil</v-icon></v-btn>
+                      <v-btn fab class="ma-2" small @click="del(item)"><v-icon small>mdi-minus</v-icon></v-btn>
+                    </div>
                   </v-toolbar>
                 </div>
                 <!-- end show -->
@@ -73,20 +83,32 @@
               <v-col>
                 <v-container class="pa-3 content" :style='content == "script" ? "display: block" : "display: none"'>
                   <v-row class="pa-3">
-                    <v-btn small fab @click="copyScript" style="position: fixed; right: 9rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
-                    <v-btn small fab @click="showEform" style="position: fixed; right: 6rem"> Eform </v-btn>
-                    <v-btn small fab @click="showPDF" style="position: fixed; right: 3rem"> PDF </v-btn>
+                    <v-btn small fab @click="copyScript" style="position: fixed; right: 12rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn small fab @click="showEform" style="position: fixed; right: 9rem"> Eform </v-btn>
+                    <v-btn small fab @click="showPDF" style="position: fixed; right: 6rem"> PDF </v-btn>
+                    <v-btn small fab @click="showData" style="position: fixed; right: 3rem"> Data </v-btn>
                   </v-row>
                   <div id="script"></div>
                 </v-container>
 
                 <v-container class="pa-3 content"  :style='content == "jrxml" ? "display: block" : "display: none"'>
                   <v-row class="pa-3">
-                    <v-btn small fab @click="copyJrxml" style="position: fixed; right: 9rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
-                    <v-btn small fab @click="showEform" style="position: fixed; right: 6rem"> Eform </v-btn>
-                    <v-btn small fab  @click="showPDF" style="position: fixed; right: 3rem"> PDF </v-btn>
+                    <v-btn small fab @click="copyJrxml" style="position: fixed; right: 12rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn small fab @click="showEform" style="position: fixed; right: 9rem"> Eform </v-btn>
+                    <v-btn small fab  @click="showPDF" style="position: fixed; right: 6rem"> PDF </v-btn>
+                    <v-btn small fab @click="showData" style="position: fixed; right: 3rem"> Data </v-btn>
                   </v-row>
                   <div id="jrxml"></div>
+                </v-container>
+
+                <v-container class="pa-3 content"  :style='content == "data" ? "display: block" : "display: none"'>
+                  <v-row class="pa-3">
+                    <v-btn small fab @click="copyData" style="position: fixed; right: 12rem"><v-icon small>mdi-content-copy</v-icon></v-btn>
+                    <v-btn small fab @click="showEform" style="position: fixed; right: 9rem"> Eform </v-btn>
+                    <v-btn small fab  @click="showPDF" style="position: fixed; right: 6rem"> PDF </v-btn>
+                    <v-btn small fab @click="showData" style="position: fixed; right: 3rem"> Data </v-btn>
+                  </v-row>
+                  <div id="data"></div>
                 </v-container>
               </v-col>
             </v-row>
@@ -115,6 +137,12 @@
     <v-dialog v-model="editInputDialog" width="800"> <edit-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></edit-input>
     </v-dialog>
 
+    <v-dialog v-model="editTextDialog" width="800"> <edit-text :item="selectedItem"></edit-text>
+    </v-dialog>
+
+    <v-dialog v-model="editTableDialog" width="800"> <edit-table :item="selectedItem"></edit-table>
+    </v-dialog>
+
     <v-dialog v-model="tableDialog" width="800"> <table-dialog @add="add" :item="selectedItem" :index="itemIndexToAdd"></table-dialog>
     </v-dialog>
   </div>
@@ -125,11 +153,14 @@
 import { html } from '@/files/html.js'
 import { script } from '@/files/script.js'
 import { jrxml } from '@/files/jrxml.js'
+import { data } from '@/files/data.js'
 import TextDialog from './TextDialog.vue'
 import TableDialog from './TableDialog.vue'
 import AddInput from './input/AddInput.vue'
 import EditInput from './input/EditInput.vue'
 import InputDialog from './InputDialog.vue'
+import EditText from './text/EditText.vue'
+import EditTable from './table/EditTable.vue'
 
 export default {
   data: () => ({
@@ -144,14 +175,16 @@ export default {
     content: 'script',
     addInputDialog: false,
     editInputDialog: false,
+    editTextDialog: false,
+    editTableDialog: false,
     textDialog: false,
     tableDialog: false,
     addInputDialogNewRow: false,
     newItemIndex: 0,
     newInputIndex: 0
   }),
-  components: {TextDialog, TableDialog, AddInput, InputDialog, EditInput},
-  mixins: [html, script, jrxml],
+  components: {TextDialog, TableDialog, AddInput, InputDialog, EditInput, EditText, EditTable},
+  mixins: [html, script, jrxml, data],
   methods: {
     add(item) {
       let vm = this
@@ -200,13 +233,21 @@ export default {
       let jrxml = document.getElementById('jrxml')
       let script = document.getElementById('script')
       let html = vm.createHtml(vm.items).replace(/\s\s+/g, " ")
+      let data = document.getElementById('data')
       jrxml.innerText = vm.createJrxml(vm.items) 
+      data.innerText = vm.createData(vm.items) 
       script.innerText = vm.createScript(vm.items, html)
     },
 
     edit(item) {
       this.selectedItem = item
-      this.editInputDialog = true
+      if (item.type == 'input') {
+        this.editInputDialog = true
+      } else if (item.type == 'text') {
+        this.editTextDialog = true
+      } else if (item.type == 'table') {
+        this.editTableDialog = true
+      }
     },
 
     del(item) {
@@ -216,17 +257,48 @@ export default {
 
     dupl(item) {
       let vm = this
-      let duplItem = {
-        index: vm.newItemIndex + 1,
-        id: item.id,
-        title: item.title,
-        placeholder: item.placeholder,
-        labelWidth: item.labelWidth,
-        inputWidth: item.inputWidth,
-        type: 'input'
+      let duplItem = {}
+      if (item.type == 'input') {
+        duplItem = {
+          index: vm.newItemIndex + 1,
+          id: item.id,
+          type: 'input'
+        }
+        let dulpInputs = []
+        item.inputs.forEach(input => {
+          let dulpInputlItem = {
+            id: input.id,
+            title: input.title,
+            placeholder: input.placeholder,
+            labelWidth: input.labelWidth,
+            type: input.type,
+            parentIndex: duplItem.index
+          } 
+          dulpInputs.push(dulpInputlItem)
+        })
+        duplItem.inputs = dulpInputs
+      } else if (item.type == 'text') {
+        duplItem = {
+          index: vm.newItemIndex + 1, 
+          id: item.id,
+          title: item.title,
+          weight: item.weight,
+          style: item.style,
+          width: item.width,
+          size: item.size,
+          align: item.align,
+          type: 'text'
+        }
+      } else if (item.type == 'table') {
+        duplItem = {
+          index: vm.newItemIndex + 1,
+          id: item.id, 
+          column: item.column,
+          type: 'table'
+        }
       }
       let findIndex = vm.items.findIndex(i => i.index == item.index)
-      vm.items.splice(vm.items[findIndex], 0, duplItem)
+      vm.items.splice(findIndex, 0, duplItem)
       vm.items.join()
       vm.newItemIndex++
     },
@@ -260,6 +332,11 @@ export default {
       navigator.clipboard.writeText(copyText.innerText)
     },
 
+    copyData() {
+      let copyText = document.getElementById('data');
+      navigator.clipboard.writeText(copyText.innerText)
+    },
+
     showPDF() {
       let vm = this
       vm.content = 'jrxml'
@@ -268,6 +345,11 @@ export default {
     showEform() {
       let vm = this
       vm.content = 'script'   
+    },
+
+    showData() {
+      let vm = this
+      vm.content = 'data'   
     },
 
     showInputDialog() {

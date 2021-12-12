@@ -18,12 +18,12 @@
     transform: translateX(-50%);
     display: none;
 }
-.v-toolbar.input-bar:hover.v-toolbar {
+.v-toolbar.js-hover-show-actions:hover.v-toolbar {
     background-color: #d1cccc;
 }
 .v-toolbar:hover .action-bars {
     display: block;
-    margin-top: -28px;
+    margin-top: -16px;
 }
 
 .v-toolbar__content p {
@@ -41,10 +41,10 @@
     padding: 3px !important;
 }
 
-.input-bar{ 
+.js-hover-show-actions{ 
     height: 100% !important;
 }
 
-.input-bar .v-toolbar__content {
+.js-hover-show-actions .v-toolbar__content {
     height: 100% !important;
 }
