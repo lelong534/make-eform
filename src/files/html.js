@@ -48,10 +48,10 @@ function createInput(item) {
     let html = ''
     item.inputs.forEach(input => {
         if (input.type == 'input') {
-            html += `<label>` + input.title + `</label>
-                <div class='form-control' id='column-`+ input.id + `'></div>`
+            html += `<label class='span`+ input.labelWidth +`'>` + input.title + `</label>&nbsp;
+                <div class='form-control span`+ input.inputWidth +`' id='column-`+ input.id + `'></div>&nbsp`
         } else {
-            html += `<label>`+ input.title +`</label>`
+            html += `<label>`+ input.title +`</label>&nbsp`
         }
     })
     return `

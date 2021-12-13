@@ -121,34 +121,52 @@ function createTableBand(item) {
 
 function createInputBand(item) {
     let inputBandData = ''
+    // item.inputs.forEach(input => {
+    //     if (input.type == 'input') {
+    //         if (input != item.inputs.at(-1)) {
+    //             inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`})) + `
+    //         } else {
+    //             inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
+    //         }
+    //     } else if (input.type == 'text') {
+    //         if (input != item.inputs.at(-1)) {
+    //             inputBandData += `" `+ input.title + ` " + `
+    //         } else {
+    //             inputBandData += `" `+ input.title + ` " `
+    //         }
+    //     }
+    // })
+
+    let currentWidth = 0
     item.inputs.forEach(input => {
         if (input.type == 'input') {
-            if (input != item.inputs.at(-1)) {
-                inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`})) + `
-            } else {
-                inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
-            }
-        } else if (input.type == 'text') {
-            if (input != item.inputs.at(-1)) {
-                inputBandData += `" `+ input.title + ` " + `
-            } else {
-                inputBandData += `" `+ input.title + ` " `
-            }
+            currentWidth += 39*(input.labelWidth + input.inputWidth)
+            inputBandData += `<textField isStretchWithOverflow="true">
+                    <reportElement stretchType="RelativeToTallestObject" x="60`+currentWidth+`" y="0" width="`+ 39*(input.labelWidth + input.inputWidth) +`" height="20">
+                        <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+                    </reportElement>
+                    <textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+                        <font fontName="Times New Roman" size="12" isBold="false"/>
+                        <paragraph lineSpacing="Double" spacingBefore="5"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA["`+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))]]></textFieldExpression>
+                </textField>`
+        } else if (item.type == 'text') {
+            currentWidth += 39*input.labelWidth
+            inputBandData += `<textField isStretchWithOverflow="true">
+                    <reportElement stretchType="RelativeToTallestObject" x="60`+currentWidth+`" y="0" width="`+ 39*input.labelWidth +`" height="20">
+                        <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+                    </reportElement>
+                    <textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+                        <font fontName="Times New Roman" size="12" isBold="false"/>
+                        <paragraph lineSpacing="Double" spacingBefore="5"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA["`+ input.title + ` "]]></textFieldExpression>
+                </textField>`
         }
-    })
-
+    }) 
     return `<band height="20">
-        <textField isStretchWithOverflow="true">
-            <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
-                <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-            </reportElement>
-            <textElement textAlignment="Left" verticalAlignment="Top" markup="html">
-                <font fontName="Times New Roman" size="12" isBold="false"/>
-                <paragraph lineSpacing="Double" spacingBefore="5"/>
-            </textElement>
-            <textFieldExpression><![CDATA[`+ inputBandData +`]]></textFieldExpression>
-        </textField>
-    </band>`
+    ` +inputBandData+ `</band>`
 }
 
 function createTextBand(item) {

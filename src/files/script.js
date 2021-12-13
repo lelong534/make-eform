@@ -1,36 +1,22 @@
 function createProperty(item) {
     if (item.type == 'input') {
-        let properties = ''
+        let properties = []
         item.inputs.forEach(input => {
             if (input.type == 'input') {
-                if (input != item.inputs.at(-1)) {
-                    properties += `"` + input.id + `": {
-                        "type": "object",
-                        "required": false
-                    },`
-                } else {
-                    properties += `"` + input.id + `": {
-                        "type": "object",
-                        "required": false
-                    }`
-                }
+                properties.push(`"` + input.id + `": {
+                    "type": "object",
+                    "required": false
+                }`)
             }
         })
-        return properties
+        return properties.join(',')
     } else if (item.type == 'table') {
-        let properties = ''
+        let properties = []
         item.column.forEach(column => {
-            if (column != item.column.at(-1)) {
-                properties += `
-                "` + column.id + `":{
-                    "type":"object"
-                },`
-            } else {
-                properties += `
-                "` + column.id + `":{
-                    "type":"object"
-                }`
-            }
+            properties.push(`
+            "` + column.id + `":{
+                "type":"object"
+            }`)
         })
 
         return `"` + item.id +`": {
@@ -39,7 +25,7 @@ function createProperty(item) {
             "items": {
               "type": "object",
               "properties":{`
-              + properties +
+              + properties.join(',') +
               `
               }
             }
