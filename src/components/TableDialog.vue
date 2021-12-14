@@ -6,12 +6,14 @@
             <v-text-field label="ID table" v-model="newItem.id"></v-text-field>
             <div v-for="item in newItem.column" :key="item.index" class="d-flex">
                 <v-text-field label="Id cột" v-model="item.id" class="pr-5"></v-text-field>
-                <v-text-field label="Tên cột" v-model="item.name"></v-text-field>
+                <v-text-field label="Tên cột" v-model="item.name" class="pr-5"></v-text-field>
+                <v-text-field label="Độ rộng" v-model="item.width"></v-text-field>
                 <v-btn fab small color="deep-orange" class="my-3 ml-3" @click="deleteColumn(item.index)"><v-icon>mdi-minus</v-icon></v-btn>
             </div>
             <div class="d-flex">
                 <v-text-field label="Id cột" v-model="columnId" class="pr-5"></v-text-field>
-                <v-text-field label="Tên cột" v-model="columnName"></v-text-field>
+                <v-text-field label="Tên cột" v-model="columnName" class="pr-5"></v-text-field>
+                <v-text-field label="Độ rộng" v-model="width"></v-text-field>
                 <v-btn fab small color="light-blue" class="my-3 ml-3" @click="addColumn"><v-icon>mdi-plus</v-icon></v-btn>
             </div>
         </v-card-text>
@@ -30,7 +32,8 @@ export default {
         },
         columnIndex: 0,
         columnId: '',
-        columnName: ''
+        columnName: '',
+        width: ''
     }),
     methods: {
         add() {
@@ -45,17 +48,20 @@ export default {
             vm.columnIndex = 0
             vm.columnId = ''
             vm.columnName = ''
+            vm.width = ''
         },
         addColumn() {
             let vm = this
             vm.newItem.column.push({
                 index: vm.columnIndex,
                 id: vm.columnId,
-                name: vm.columnName
+                name: vm.columnName,
+                width: vm.width
             })
             vm.columnIndex++
             vm.columnId = ''
             vm.columnName = ''
+            vm.width = ''
         },
         deleteColumn(index) {
             let vm = this

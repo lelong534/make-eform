@@ -9,14 +9,14 @@
                 <!-- show input -->
                 <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions" v-if="item.type=='input'">
                   <v-row>
-                    <div v-for="input in item.inputs" :key="input.id" class="d-flex px-1" :style="{'width': (input.labelWidth + input.inputWidth) * 8.33 + '%'}">
-                      <div :style="{'width': input.labelWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'input'">
-                        <p>{{input.title}}</p>
+                    <div v-for="input in item.inputs" :key="input.id" class="d-flex px-1" :style="{'width': input.inputWidth * 8.33 + '%'}">
+                      <div :style="{'width': input.labelWidth / input.inputWidth * 100 + '%'}" v-if="input.type == 'input'">
+                        <p>{{input.title == undefined ? "" : input.title}}</p>
                       </div>
-                      <div :style="{'width': input.inputWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'input'">
+                      <div :style="{'width': (input.inputWidth - input.labelWidth) / input.inputWidth * 100 + '%'}" v-if="input.type == 'input' && input.labelWidth < input.inputWidth">
                         <v-text-field outlined dense></v-text-field>
                       </div>
-                      <div :style="{'width': input.labelWidth / (input.labelWidth + input.inputWidth) * 100 + '%'}" v-if="input.type == 'text'">
+                      <div v-if="input.type == 'text'">
                         <p>{{input.title}}</p>
                       </div>
                     </div>
@@ -134,13 +134,13 @@
     <v-dialog v-model="addInputDialogNewRow" width="800"> <input-dialog @add="addInput"></input-dialog>
     </v-dialog>
 
-    <v-dialog v-model="editInputDialog" width="800"> <edit-input @add="addInput" :item="selectedItem" :index="itemIndexToAdd"></edit-input>
+    <v-dialog v-model="editInputDialog" width="800"> <edit-input @add="add" :item="selectedItem" :index="itemIndexToAdd"></edit-input>
     </v-dialog>
 
-    <v-dialog v-model="editTextDialog" width="800"> <edit-text :item="selectedItem"></edit-text>
+    <v-dialog v-model="editTextDialog" width="800"> <edit-text @add="add" :item="selectedItem"></edit-text>
     </v-dialog>
 
-    <v-dialog v-model="editTableDialog" width="800"> <edit-table :item="selectedItem"></edit-table>
+    <v-dialog v-model="editTableDialog" width="800"> <edit-table @add="add" :item="selectedItem"></edit-table>
     </v-dialog>
 
     <v-dialog v-model="tableDialog" width="800"> <table-dialog @add="add" :item="selectedItem" :index="itemIndexToAdd"></table-dialog>
@@ -197,6 +197,10 @@ export default {
         let findIndex = vm.items.findIndex(i => i.index == item.index)
         vm.items[findIndex] = item
       }
+      vm.addInputDialog = false
+      vm.editInputDialog = false
+      vm.editTextDialog = false
+      vm.editTableDialog = false
       vm.generateScriptPdf()
     },
 
@@ -220,6 +224,8 @@ export default {
         vm.items[findIndex].inputs.push(itemInput)
       }
       vm.itemIndexToAdd = ''
+      vm.addInputDialogNewRow = false
+      vm.addInputDialog = false
       
       vm.generateScriptPdf()
     },

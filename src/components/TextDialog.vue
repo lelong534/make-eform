@@ -22,7 +22,7 @@
             </v-row>
         </v-card-text>
 
-        <v-card-actions>
+        <v-card-actions class="d-flex justify-center pb-5">
         <v-btn class="mx-3 success" @click="add()">Tạo mới</v-btn>
         </v-card-actions>
     </v-card>
@@ -48,10 +48,6 @@ export default {
             vm.newItem.weight = vm.weight
             vm.newItem.style = vm.style
             vm.newItem.size =  vm.size
-            // console.log(vm.newItem)
-            // if (vm.newItem.width == undefined || vm.newItem.width == '') {
-            //     vm.newItem.width = [0, 0]
-            // }
             vm.$emit("add", vm.newItem)
             vm.newItem = {
                 width: [0,12]

@@ -13,7 +13,7 @@
                 <!-- <v-btn fab class="ma-2 size" small>
                     <v-text-field rounded v-model="size"></v-text-field>
                 </v-btn> -->
-                <v-btn fab class="ma-2" small @click="changeSize()" :color="size == 'h3' ? 'cyan' : ''"><v-icon>mdi-format-header-3</v-icon></v-btn>
+                <v-btn fab class="ma-2" small @click="changeSize()" :color="item.size == 'h3' ? 'cyan' : ''"><v-icon>mdi-format-header-3</v-icon></v-btn>
             </v-row>
             <v-row>
                 <v-col>
@@ -22,6 +22,9 @@
                 </v-col>
             </v-row>
         </v-card-text>
+        <v-card-actions class="d-flex justify-center pb-5">
+            <v-btn class="mx-3 success" @click="update()">Cập nhật</v-btn>
+        </v-card-actions>
     </v-card>
 </template>
 
@@ -33,18 +36,25 @@ export default {
             this.item.align = align
         },
         changeWeight() {
-            if (this.item.weight == 'normal') this.item.weight = 'bold'
-            else this.item.weight = 'normal'
+            let vm = this
+            if (vm.item.weight == 'normal') vm.item.weight = 'bold'
+            else vm.item.weight = 'normal'
         },
         changeStyle() {
-            if (this.item.style == 'normal') this.item.style = 'italic'
-            else this.item.style = 'normal'
+            let vm = this
+            if (vm.item.style == 'normal') vm.item.style = 'italic'
+            else vm.item.style = 'normal'
         },
         changeSize() {
-            if (this.item.size == '') {
-                this.item.size = 'h3'
+            let vm = this
+            if (vm.item.size == '') {
+                vm.item.size = 'h3'
             }
-            else this.item.size = ''
+            else vm.item.size = ''
+        },
+        update() {
+            let vm = this
+            vm.$emit("add", vm.item)
         }
     }
 };

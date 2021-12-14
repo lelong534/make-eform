@@ -34,11 +34,13 @@ function createText(item) {
     let rightSpace = 12 - item.width[1]
     let contentSpace = item.width[1] - item.width[0]
 
+    let title = item.title == undefined ? "" : item.title
+
     return `
     <div class='row'>
         `+ (leftSpace > 0 ? `<div class='span`+ leftSpace +` row-flex'></div>` : '') 
         + `<div class='span`+ contentSpace +` row-flex ` + align + ` ` + style + ` ` + `'>
-            <label>` + item.title + `</label>
+            <label>` + title + `</label>
         </div>
         `+ (rightSpace > 0 ? `<div class='span`+ rightSpace +` row-flex'></div>` : '')
     +`</div>`;
@@ -48,8 +50,16 @@ function createInput(item) {
     let html = ''
     item.inputs.forEach(input => {
         if (input.type == 'input') {
-            html += `<label class='span`+ input.labelWidth +`'>` + input.title + `</label>&nbsp;
-                <div class='form-control span`+ input.inputWidth +`' id='column-`+ input.id + `'></div>&nbsp`
+            if (input.fixWidth) {
+                html += `<label class='span`+ input.labelWidth +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
+                <div class='form-control w250' id='column-`+ input.id + `'></div>&nbsp`
+            } else if (input.labelWidth == input.inputWidth) {
+                html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;`
+            }
+            else {
+                html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
+                <div class='form-control span`+ (input.inputWidth - input.labelWidth) +`' id='column-`+ input.id + `'></div>&nbsp`
+            }
         } else {
             html += `<label>`+ input.title +`</label>&nbsp`
         }
@@ -390,6 +400,12 @@ const htmlstyle = `<div class='alpacaa' style='font-family: â€˜Times New Romanâ€
         }
         .text-center {
             text-align: center;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .text-end {
+            text-align: right;
         }
         .row-center {
             justify-content: center;

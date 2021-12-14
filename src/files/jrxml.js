@@ -1,7 +1,7 @@
 function createField(item) {
     let fields = ''
     item.inputs.forEach(input => {
-        if (input.type == 'input') {
+        if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
             fields += `<field name="` + input.id  + `" class="java.lang.String">
                     <fieldDescription><![CDATA[` + input.id + `]]></fieldDescription>
                 </field>`
@@ -50,7 +50,6 @@ function createTableBand(item) {
     let startBands = ''
     let endBands = ''
     let bodyBands = ''
-    let tableColumnNumber = item.column.length
 
     if (autoIncrement) {
         startBands = `
@@ -93,10 +92,10 @@ function createTableBand(item) {
         
         item.column.forEach(col => {
             bodyBands += `
-                <jr:column width="`+430/tableColumnNumber+`">
+                <jr:column width="`+ col.width +`">
                     <jr:columnHeader style="Table_CH" height="30">
                         <staticText>
-                            <reportElement x="0" y="0" width="`+430/tableColumnNumber+`" height="30"/>
+                            <reportElement x="0" y="0" width="`+ col.width +`" height="30"/>
                             <textElement textAlignment="Center" verticalAlignment="Middle">
                                 <font fontName="Times New Roman" size="12" isBold="true"/>
                             </textElement>
@@ -105,7 +104,7 @@ function createTableBand(item) {
                     </jr:columnHeader>
                     <jr:detailCell style="Table_TD" height="30">
                         <textField>
-                            <reportElement x="0" y="0" width="`+430/tableColumnNumber+`" height="30"/>
+                            <reportElement x="0" y="0" width="`+ col.width +`" height="30"/>
                             <textElement textAlignment="Center" verticalAlignment="Middle">
                                 <font fontName="Times New Roman" size="12"/>
                             </textElement>
@@ -121,48 +120,58 @@ function createTableBand(item) {
 
 function createInputBand(item) {
     let inputBandData = ''
-    // item.inputs.forEach(input => {
-    //     if (input.type == 'input') {
-    //         if (input != item.inputs.at(-1)) {
-    //             inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`})) + `
-    //         } else {
-    //             inputBandData += `" `+ input.title + ` " + ($F{` + input.id + `} == null ? "" : TRIM($F{`+ input.id +`})) `
-    //         }
-    //     } else if (input.type == 'text') {
-    //         if (input != item.inputs.at(-1)) {
-    //             inputBandData += `" `+ input.title + ` " + `
-    //         } else {
-    //             inputBandData += `" `+ input.title + ` " `
-    //         }
-    //     }
-    // })
 
     let currentWidth = 0
+    let textAlignment = ''
+    let x = 60
+    let pdfAlign = 'Left'
     item.inputs.forEach(input => {
-        if (input.type == 'input') {
-            currentWidth += 39*(input.labelWidth + input.inputWidth)
+        if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+            x += currentWidth
+            if (input.pdfAlign == true) pdfAlign = 'Center'
+            else pdfAlign = 'Left'
             inputBandData += `<textField isStretchWithOverflow="true">
-                    <reportElement stretchType="RelativeToTallestObject" x="60`+currentWidth+`" y="0" width="`+ 39*(input.labelWidth + input.inputWidth) +`" height="20">
+                    <reportElement stretchType="RelativeToTallestObject" x="`+ x +`" y="0" width="`+ 39*input.inputWidth +`" height="20">
                         <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
                     </reportElement>
-                    <textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+                    <textElement textAlignment="`+ pdfAlign +`" verticalAlignment="Top" markup="html">
                         <font fontName="Times New Roman" size="12" isBold="false"/>
                         <paragraph lineSpacing="Double" spacingBefore="5"/>
                     </textElement>
-                    <textFieldExpression><![CDATA["`+ input.title + ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))]]></textFieldExpression>
+                    <textFieldExpression><![CDATA["`+ (input.title == undefined ? "" : input.title)+ ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))]]></textFieldExpression>
                 </textField>`
-        } else if (item.type == 'text') {
-            currentWidth += 39*input.labelWidth
+            currentWidth += 39*input.inputWidth
+        } else if (input.type == 'input') {
+            x += currentWidth
+            if (input.pdfAlign == true) pdfAlign = 'Center'
+            else pdfAlign = 'Left'
             inputBandData += `<textField isStretchWithOverflow="true">
-                    <reportElement stretchType="RelativeToTallestObject" x="60`+currentWidth+`" y="0" width="`+ 39*input.labelWidth +`" height="20">
+                    <reportElement stretchType="RelativeToTallestObject" x="`+ x +`" y="0" width="`+ 39*input.inputWidth +`" height="20">
                         <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
                     </reportElement>
-                    <textElement textAlignment="Left" verticalAlignment="Top" markup="html">
+                    <textElement textAlignment="`+ pdfAlign +`" verticalAlignment="Top" markup="html">
+                        <font fontName="Times New Roman" size="12" isBold="false"/>
+                        <paragraph lineSpacing="Double" spacingBefore="5"/>
+                    </textElement>
+                    <textFieldExpression><![CDATA["`+ (input.title == undefined ? "" : input.title) + ` "]]></textFieldExpression>
+                </textField>`
+            currentWidth += 39*input.inputWidth
+        } else if (item.type == 'text') {
+            if (input.align == 'left') textAlignment = 'Left'
+            else if (input.align == 'center') textAlignment = 'Center'
+            else textAlignment = 'Right'
+            x += currentWidth
+            inputBandData += `<textField isStretchWithOverflow="true">
+                    <reportElement stretchType="RelativeToTallestObject" x="`+ x +`" y="0" width="`+ 39*input.labelWidth +`" height="20">
+                        <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+                    </reportElement>
+                    <textElement textAlignment="`+ textAlignment +`" verticalAlignment="Top" markup="html">
                         <font fontName="Times New Roman" size="12" isBold="false"/>
                         <paragraph lineSpacing="Double" spacingBefore="5"/>
                     </textElement>
                     <textFieldExpression><![CDATA["`+ input.title + ` "]]></textFieldExpression>
                 </textField>`
+            currentWidth += 39*input.labelWidth
         }
     }) 
     return `<band height="20">
@@ -191,6 +200,8 @@ function createTextBand(item) {
         isBold = true
     }
 
+    let title = item.title == undefined ? "" : item.title
+
     return `<band height="20">
         <textField isStretchWithOverflow="true">
             <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
@@ -200,7 +211,7 @@ function createTextBand(item) {
                 <font fontName="Times New Roman" size="`+ size +`" isBold="`+ isBold + `" isItalic="` + isItalic +`"/>
                 <paragraph lineSpacing="Double" spacingBefore="5"/>
             </textElement>
-            <textFieldExpression><![CDATA["` + item.title +`"]]></textFieldExpression>
+            <textFieldExpression><![CDATA["` + title +`"]]></textFieldExpression>
         </textField>
     </band>`
 }
