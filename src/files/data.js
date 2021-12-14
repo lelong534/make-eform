@@ -5,6 +5,7 @@ export const data = {
             items.forEach(item => {
                 if (item.type == 'input') {
                     item.inputs.forEach(input => {
+                        if (input.inputWidth - input.labelWidth > 0)
                         data.push(createInput(input))
                     })
                 }

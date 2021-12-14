@@ -1,7 +1,7 @@
 function createField(item) {
     let fields = ''
     item.inputs.forEach(input => {
-        if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+        if (input.inputWidth - input.labelWidth > 0) {
             fields += `<field name="` + input.id  + `" class="java.lang.String">
                     <fieldDescription><![CDATA[` + input.id + `]]></fieldDescription>
                 </field>`
@@ -120,13 +120,18 @@ function createTableBand(item) {
 
 function createInputBand(item) {
     let inputBandData = ''
+    let inputContentFixWidth = []
+    let fixWidth = false
 
     let currentWidth = 0
-    let textAlignment = ''
     let x = 60
     let pdfAlign = 'Left'
     item.inputs.forEach(input => {
-        if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+        if (input.inputWidth - input.labelWidth > 0) {
+            if (input.fixWidth == true) fixWidth = true
+            if (fixWidth) {
+                inputContentFixWidth.push((input.title == undefined ? "" : `"` + input.title + ` "`)+ `+ ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))`+ (input.appendText == undefined ? '' : `+ " ` + input.appendText + ` "`))
+            }
             x += currentWidth
             if (input.pdfAlign == true) pdfAlign = 'Center'
             else pdfAlign = 'Left'
@@ -138,10 +143,14 @@ function createInputBand(item) {
                         <font fontName="Times New Roman" size="12" isBold="false"/>
                         <paragraph lineSpacing="Double" spacingBefore="5"/>
                     </textElement>
-                    <textFieldExpression><![CDATA["`+ (input.title == undefined ? "" : input.title)+ ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))]]></textFieldExpression>
+                    <textFieldExpression><![CDATA["`+ (input.title == undefined ? "" : input.title)+ ` " + ($F{` + input.id + `} == null ? " " : TRIM($F{`+ input.id +`}))`+ (input.appendText == undefined ? "" : `+ " ` + input.appendText + ` "`) +`]]></textFieldExpression>
                 </textField>`
             currentWidth += 39*input.inputWidth
-        } else if (input.type == 'input') {
+        } else if (input.inputWidth - input.labelWidth == 0) {
+            if (input.fixWidth == true) fixWidth = true
+            if (fixWidth) {
+                inputContentFixWidth.push(input.title == undefined ? '' : `"` + input.title + ` "`)
+            }
             x += currentWidth
             if (input.pdfAlign == true) pdfAlign = 'Center'
             else pdfAlign = 'Left'
@@ -156,26 +165,26 @@ function createInputBand(item) {
                     <textFieldExpression><![CDATA["`+ (input.title == undefined ? "" : input.title) + ` "]]></textFieldExpression>
                 </textField>`
             currentWidth += 39*input.inputWidth
-        } else if (item.type == 'text') {
-            if (input.align == 'left') textAlignment = 'Left'
-            else if (input.align == 'center') textAlignment = 'Center'
-            else textAlignment = 'Right'
-            x += currentWidth
-            inputBandData += `<textField isStretchWithOverflow="true">
-                    <reportElement stretchType="RelativeToTallestObject" x="`+ x +`" y="0" width="`+ 39*input.labelWidth +`" height="20">
+        }
+    }) 
+    if (fixWidth) {
+        return `
+            <band height="20">
+                <textField isStretchWithOverflow="true">
+                    <reportElement stretchType="RelativeToTallestObject" x="60" y="0" width="470" height="20">
                         <property name="com.jaspersoft.studio.unit.height" value="pixel"/>
                     </reportElement>
-                    <textElement textAlignment="`+ textAlignment +`" verticalAlignment="Top" markup="html">
+                    <textElement textAlignment="`+ pdfAlign +`" verticalAlignment="Top" markup="html">
                         <font fontName="Times New Roman" size="12" isBold="false"/>
                         <paragraph lineSpacing="Double" spacingBefore="5"/>
                     </textElement>
-                    <textFieldExpression><![CDATA["`+ input.title + ` "]]></textFieldExpression>
-                </textField>`
-            currentWidth += 39*input.labelWidth
-        }
-    }) 
-    return `<band height="20">
-    ` +inputBandData+ `</band>`
+                    <textFieldExpression><![CDATA[` + inputContentFixWidth.join("+") + `]]></textFieldExpression>
+                </textField>
+            </band>`
+    } else {
+        return `<band height="20">
+        ` +inputBandData+ `</band>`
+    }
 }
 
 function createTextBand(item) {

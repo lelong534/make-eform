@@ -10,13 +10,16 @@
                 <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions" v-if="item.type=='input'">
                   <v-row>
                     <div v-for="input in item.inputs" :key="input.id" class="d-flex px-1" :style="{'width': input.inputWidth * 8.33 + '%'}">
-                      <div :style="{'width': input.labelWidth / input.inputWidth * 100 + '%'}" v-if="input.type == 'input'">
+                      <div :style="{'width': input.labelWidth / input.inputWidth * 100 + '%'}" v-if="input.inputWidth - input.labelWidth > 0">
                         <p>{{input.title == undefined ? "" : input.title}}</p>
                       </div>
-                      <div :style="{'width': (input.inputWidth - input.labelWidth) / input.inputWidth * 100 + '%'}" v-if="input.type == 'input' && input.labelWidth < input.inputWidth">
+                      <div :style="{'width': (input.inputWidth - input.labelWidth) / input.inputWidth * 90 + '%'}" v-if="input.inputWidth - input.labelWidth > 0">
                         <v-text-field outlined dense></v-text-field>
                       </div>
-                      <div v-if="input.type == 'text'">
+                      <div :style="{'width': (input.inputWidth - input.labelWidth) / input.inputWidth * 10 + '%'}" v-if="input.inputWidth - input.labelWidth > 0">
+                        <p>{{input.appendText == undefined ? "" : input.appendText}}</p>
+                      </div>
+                      <div v-if="input.inputWidth - input.labelWidth <= 0">
                         <p>{{input.title}}</p>
                       </div>
                     </div>
@@ -32,14 +35,13 @@
                 <!-- show text -->
                 <div v-if="item.type=='text'">
                   <v-toolbar elevation="3" class="mb-2 pt-3 js-hover-show-actions">
-                    <v-row>
-                      <v-col :md="item.width[0]" v-if="item.width[0] != 0">
-                      </v-col>
-                      <v-col :md="item.width[1]-item.width[0]">
+                    <v-row style="width: 100%">
+                      <div :style="{'width': item.width[0] * 8.33 + '%'}"></div>
+                      <div :style="{'width': (item.width[1] - item.width[0]) * 8.33 + '%'}">
                         <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:start"' v-if="item.align == 'left'"> {{item.title}} </p>
                         <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:center"' v-if="item.align == 'center'"> {{item.title}} </p>
                         <p :style='"font-weight:" + item.weight  + ";font-style:" + item.style+";text-align:end"' v-if="item.align == 'end'"> {{item.title}} </p>
-                      </v-col>
+                      </div>
                     </v-row>
                     <div class="action-bars">
                       <v-btn fab class="ma-2" small @click="dupl(item)"><v-icon small>mdi-content-copy</v-icon></v-btn>
@@ -73,6 +75,13 @@
                 <v-spacer></v-spacer>
               </v-toolbar>
             </v-card>
+            <h5>Chú ý</h5>
+            <ul>
+              <li><h5>Mỗi bảng có kích thước 430, do 40 dùng để chứa cột số thứ tự</h5></li>
+              <li><h5>Mỗi dòng chỉ chứa 1 loại input (có độ dài 250 hoặc không)</h5></li>
+              <li><h5>Trong 1 input nếu độ dài input và độ dài label bằng nhau thì coi như input đấy chỉ chứa text</h5></li>
+              <li><h5>Tạo khoảng trống bằng cách tạo text không có nội dung</h5></li>
+            </ul>
           </v-container>
         </v-col>
 
@@ -188,7 +197,6 @@ export default {
   methods: {
     add(item) {
       let vm = this
-      console.log(item)
       if (item.index == undefined) {
         item.index = vm.newItemIndex
         vm.items.push(item)
@@ -277,8 +285,12 @@ export default {
             title: input.title,
             placeholder: input.placeholder,
             labelWidth: input.labelWidth,
-            type: input.type,
-            parentIndex: duplItem.index
+            parentIndex: duplItem.index,
+            align: input.align,
+            fixWidth: input.fixWidth,
+            index: input.index,
+            inputWidth: input.inputWidth,
+            appendText: input.appendText
           } 
           dulpInputs.push(dulpInputlItem)
         })

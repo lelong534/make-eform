@@ -2,7 +2,7 @@ function createProperty(item) {
     if (item.type == 'input') {
         let properties = []
         item.inputs.forEach(input => {
-            if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+            if (input.inputWidth - input.labelWidth > 0) {
                 properties.push(`"` + input.id + `": {
                     "type": "object",
                     "required": false
@@ -37,7 +37,7 @@ function createFieldOption(item) {
     if (item.type == 'input') {
         let fields = ''
         item.inputs.forEach(input => {
-            if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+            if (input.inputWidth - input.labelWidth > 0) {
                 if (input != item.inputs.at(-1)) {
                     fields += `"` + input.id + `": {
                         "id": "` + input.id + `",
@@ -98,7 +98,7 @@ function createBinding(item) {
     if (item.type == 'input') {
         let bindings = ''
         item.inputs.forEach(input => {
-            if (input.type == 'input' && input.inputWidth - input.labelWidth > 0) {
+            if (input.inputWidth - input.labelWidth > 0) {
                 if (input != item.inputs.at(-1)) {
                     bindings += `"` + input.id +`" : "column-`+ input.id +`",`
                 } else {

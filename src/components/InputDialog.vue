@@ -6,10 +6,11 @@
             <v-text-field label="id" v-model="item.id"></v-text-field>
             <v-text-field label="Title" v-model="item.title"></v-text-field>
             <v-text-field label="Giá trị khởi tạo" v-model="item.placeholder"></v-text-field>
+            <v-text-field label="Nội dung mở rộng" v-model="item.appendText"></v-text-field>
             <div class="d-flex flex-column">
                 <div>Định dạng input</div>
                 <v-switch v-model="item.fixWidth" label="Width 250" class="mr-5"></v-switch>
-                <v-slider max="12" ticks="always" :tick-labels="['0', 1, 2, 3, 4, 5, 6,7 , 8, 9, 10, 11, 12]" v-model="item.inputWidth"></v-slider>
+                <v-slider max="12" ticks="always" :tick-labels="['0', 1, 2, 3, 4, 5, 6,7 , 8, 9, 10, 11, 12]" v-model="item.inputWidth" :disabled="item.fixWidth"></v-slider>
             </div>
             <h3>Định dạng label</h3>
             <div class="d-flex flex-column">
@@ -33,19 +34,20 @@ export default {
             labelWidth: 1,
             inputWidth: 12,
             align: 'left',
-            fixWidth: false
+            fixWidth: false,
+            appendText: ''
         }
     }),
     methods: {
         add() {
             let vm = this
-            vm.item.type = 'input'
             vm.$emit("add", this.item)
             vm.item = {
                 labelWidth: 1,
                 inputWidth: 12,
                 align: 'left',
-                fixWidth: false
+                fixWidth: false,
+                appendText: ''
             }
         },
         changeAlign(align) {

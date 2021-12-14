@@ -49,19 +49,20 @@ function createText(item) {
 function createInput(item) {
     let html = ''
     item.inputs.forEach(input => {
-        if (input.type == 'input') {
-            if (input.fixWidth) {
-                html += `<label class='span`+ input.labelWidth +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
-                <div class='form-control w250' id='column-`+ input.id + `'></div>&nbsp`
-            } else if (input.labelWidth == input.inputWidth) {
-                html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;`
-            }
-            else {
-                html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
-                <div class='form-control span`+ (input.inputWidth - input.labelWidth) +`' id='column-`+ input.id + `'></div>&nbsp`
-            }
-        } else {
-            html += `<label>`+ input.title +`</label>&nbsp`
+        if (input.fixWidth) {
+            html += `<label>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
+            <div class='form-control w250' id='column-`+ input.id + `'></div>&nbsp;
+            <label>`+ (input.appendText == undefined ? '' : input.appendText) +`</label>&nbsp;`
+
+            return `<div class='row'>`+ html +`</div>`;
+
+        } else if (input.labelWidth == input.inputWidth) {
+            html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;`
+        }
+        else {
+            html += `<label class='span`+ input.labelWidth +` text-`+ input.align +`'>` + (input.title == undefined ? "" : input.title) + `</label>&nbsp;
+            <div class='form-control span`+ (input.inputWidth - input.labelWidth) +`' id='column-`+ input.id + `'></div>&nbsp;
+            <label>`+ (input.appendText == undefined ? '' : input.appendText) +`</label>&nbsp;`
         }
     })
     return `
