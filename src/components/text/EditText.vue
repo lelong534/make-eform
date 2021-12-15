@@ -34,16 +34,19 @@ export default {
     methods: {
         changeAlign(align) {
             this.item.align = align
+            this.$forceUpdate()
         },
         changeWeight() {
             let vm = this
             if (vm.item.weight == 'normal') vm.item.weight = 'bold'
             else vm.item.weight = 'normal'
+            this.$forceUpdate()
         },
         changeStyle() {
             let vm = this
             if (vm.item.style == 'normal') vm.item.style = 'italic'
             else vm.item.style = 'normal'
+            this.$forceUpdate()
         },
         changeSize() {
             let vm = this
@@ -51,6 +54,7 @@ export default {
                 vm.item.size = 'h3'
             }
             else vm.item.size = ''
+            this.$forceUpdate()
         },
         update() {
             let vm = this

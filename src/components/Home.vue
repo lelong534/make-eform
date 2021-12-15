@@ -124,7 +124,7 @@
             <v-row>
               <v-container class="px-3 py-0">
                 <v-btn color="info" @click="importState" class="mb-3">Đặt lại cấu hình</v-btn>
-                <v-textarea rows="13" id="state-textarea" outlined :value="JSON.stringify(items, null, '\t')">
+                <v-textarea rows="9" id="state-textarea" outlined :value="JSON.stringify(items, null, '\t')">
                 </v-textarea>
               </v-container>
             </v-row>
