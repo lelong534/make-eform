@@ -290,7 +290,8 @@ export default {
             fixWidth: input.fixWidth,
             index: input.index,
             inputWidth: input.inputWidth,
-            appendText: input.appendText
+            appendText: input.appendText,
+            rows: input.rows
           } 
           dulpInputs.push(dulpInputlItem)
         })

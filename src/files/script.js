@@ -35,21 +35,22 @@ function createProperty(item) {
 
 function createFieldOption(item) {
     if (item.type == 'input') {
-        let fields = ''
+        let fields = []
         item.inputs.forEach(input => {
             if (input.inputWidth - input.labelWidth > 0) {
-                if (input != item.inputs.at(-1)) {
-                    fields += `"` + input.id + `": {
+                if (input.rows > 1) {
+                    fields.push(`"` + input.id + `": {
                         "id": "` + input.id + `",
                         "name": "` + input.id + `",
-                        "type": "text",
+                        "type": "textarea",
+                        "rows": `+ input.rows +`,
                         "label": "",
                         "fieldClass": "form-input-100",
                         "rule": "maxlength1000",
                         "title": "` + input.title + `"
-                    },`
+                    }`)  
                 } else {
-                    fields += `"` + input.id + `": {
+                    fields.push(`"` + input.id + `": {
                         "id": "` + input.id + `",
                         "name": "` + input.id + `",
                         "type": "text",
@@ -57,11 +58,11 @@ function createFieldOption(item) {
                         "fieldClass": "form-input-100",
                         "rule": "maxlength1000",
                         "title": "` + input.title + `"
-                    }`
+                    }`)
                 }
             }
         })
-        return fields
+        return fields.join(",")
     } else if (item.type == 'table') {
         let fields = ''
         item.column.forEach(column => {

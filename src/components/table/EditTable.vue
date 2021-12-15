@@ -14,7 +14,7 @@
                 <v-text-field label="Id cột" v-model="columnId" class="pr-5"></v-text-field>
                 <v-text-field label="Tên cột" v-model="columnName" class="pr-5"></v-text-field>
                 <v-text-field label="Độ rộng" v-model="width"></v-text-field>
-                <v-btn fab small color="light-blue" class="my-3 ml-3" @click="addColumn"><v-icon>mdi-plus</v-icon></v-btn>
+                <v-btn fab small color="light-blue" class="my-3 ml-3" @click="addColumn()"><v-icon>mdi-plus</v-icon></v-btn>
             </div>
         </v-card-text>
         <v-card-actions class="d-flex justify-center pb-5">

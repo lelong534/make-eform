@@ -7,8 +7,9 @@
             <v-text-field label="Title" v-model="newItem.title"></v-text-field>
             <v-text-field label="Giá trị khởi tạo" v-model="newItem.placeholder"></v-text-field>
             <v-text-field label="Nội dung mở rộng" v-model="newItem.appendText"></v-text-field>
+                <v-text-field label="Số dòng textarea" v-model="newItem.rows"></v-text-field>
             <div class="d-flex flex-column">
-                <div>Định dạng input</div>
+                <div>Độ dài toàn bộ</div>
                 <v-switch v-model="newItem.fixWidth" label="Width 250" class="mr-5"></v-switch>
                 <v-slider max="12" ticks="always" :tick-labels="['0', 1, 2, 3, 4, 5, 6,7 , 8, 9, 10, 11, 12]" v-model="newItem.inputWidth" :disabled="newItem.fixWidth"></v-slider>
             </div>
@@ -35,7 +36,8 @@ export default {
             fixWidth: false,
             inputWidth: 12,
             labelWidth: 1,
-            appendText: ''
+            appendText: '',
+            rows: 1
         },
     }),
     props: ['index'],
@@ -51,7 +53,8 @@ export default {
                 inputWidth: 12,
                 align: 'left',
                 fixWidth: false,
-                appendText: ''
+                appendText: '',
+                rows: 1
             }
         },
         changeAlign(align) {

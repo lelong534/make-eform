@@ -9,8 +9,9 @@
                 <v-text-field label="Title" v-model="input.title"></v-text-field>
                 <v-text-field label="Giá trị khởi tạo" v-model="input.placeholder"></v-text-field> 
                 <v-text-field label="Nội dung mở rộng" v-model="input.appendText"></v-text-field> 
+                <v-text-field label="Số dòng textarea" v-model="input.rows"></v-text-field>
                 <div class="d-flex flex-column">
-                    <div>Định dạng input</div>
+                    <div>Độ dài toàn bộ</div>
                     <v-switch v-model="input.fixWidth" label="Width 250" class="mr-5"></v-switch>
                     <v-slider max="12" ticks="always" :tick-labels="['0', 1, 2, 3, 4, 5, 6,7 , 8, 9, 10, 11, 12]" v-model="input.inputWidth" :disabled="input.fixWidth"></v-slider>
                 </div>
