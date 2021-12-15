@@ -115,19 +115,15 @@ function createBinding(item) {
 export const script = {
     methods: {
         createScript(items, html) {
-            let properties = ''
-            let fieldOptions = ''
-            let bindings = ''
+            let properties = []
+            let fieldOptions = []
+            let bindings = []
 
             items.forEach(item => {
-                if (item.type != 'text' && item != items.at(-1)) {
-                    properties += createProperty(item) + ","
-                    fieldOptions += createFieldOption(item) + ","
-                    bindings += createBinding(item) + ","
-                } else if (item.type != 'text') {
-                    properties += createProperty(item)
-                    fieldOptions += createFieldOption(item)
-                    bindings += createBinding(item)
+                if (item.type != 'text') {
+                    properties.push(createProperty(item))
+                    fieldOptions.push(createFieldOption(item))
+                    bindings.push(createBinding(item))
                 }
             });
 
@@ -136,7 +132,7 @@ export const script = {
                     "type": "object",
                     "required": false,
                     "properties": {
-            ` + properties +
+            ` + properties.join(",") +
             `
             }
                 },
@@ -144,7 +140,7 @@ export const script = {
                     "type": "object",
                     "legendStyle": "",
                     "fields": {
-            ` + fieldOptions +
+            ` + fieldOptions.join(",") +
             `
             }
                 },
@@ -152,7 +148,7 @@ export const script = {
                     "layout": {
                         "template": "` + html + `",
                         "bindings": {
-            ` + bindings + 
+            ` + bindings.join(",") + 
             `
             }     
                 },
